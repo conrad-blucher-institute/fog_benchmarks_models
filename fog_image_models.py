@@ -5,45 +5,115 @@ import torch.optim as optim
 from torch.optim import lr_scheduler
 from torch.utils.data import TensorDataset, DataLoader
 # Torchsat
-from torchsat.models.classification.resnet import resnet18
+from torchsat.models.classification.resnet import resnet18, resnet34, resnet50, resnet101, resnet152
 from torchsat.models.classification.vgg import vgg16
+from torchsat.models.classification.densenet import densenet121, densenet201
 # System
 import os
 import time
 import numpy as np
 import pandas as pd
+from optparse import OptionParser
 
 ###########
 # Options #
 ###########
+parser = OptionParser()
+parser.add_option("-a", "--architecture",
+	help="Selected architecture (resnet18, resnet34, resnet50, resnet101, resnet152, vgg16, densenet121, densenet201)",
+	default="resnet18",
+)
+parser.add_option("-f", "--file",
+	help="Path to save trained model",
+	default = None,
+)
+parser.add_option("-l", "--learn_rate",
+	help="Learning rate",
+	default = 0.1, type="float",
+)
+parser.add_option("-b", "--batch_size",
+	help="Batch size",
+	default=64, type="int",
+)
+parser.add_option("-e", "--epochs",
+	help="Number of training epochs",
+	default=50, type="int",
+)
+parser.add_option("-i", "--identifier",
+	help="String to add to end of generated output filename",
+	default = "test",
+)
+(options, args) = parser.parse_args()
 
 # Device for training
 device = torch.device("cuda")
 # Rate to print training status
-printFreq = 10
+printFreq = 15
 
 #########
 # Model #
 #########
 
+# Selected architecture
+architecture = options.architecture
+
 # Definitions
-width = 32
-height = 32
-channels = 384
-classes = 2
+width    = 32
+height   = 32
+channels = 385
+classes  = 2
 
 # Hyperparameters
-learningRate = 0.1
-nEpochs = 10
-batchSize = 64
+learningRate = options.learn_rate
+nEpochs      =  options.epochs
+batchSize    = options.batch_size
 
-# Load model
-model = vgg16(in_channels=channels, num_classes=classes, pretrained=False)
+# Path to save model
+output_file = options.file
+if output_file is None:
+	# Path based on params
+	output_file = "fog-{a}__lr{l}__e{e}__b{b}__{i}.pt".format(
+		a=architecture, l=learningRate, e=nEpochs, b=batchSize, i=options.identifier)
+
+# Load architecture
+if architecture == "resnet18":
+	model = resnet18(in_channels=channels, num_classes=classes)
+elif architecture == "resnet34":
+	model = resnet34(in_channels=channels, num_classes=classes)
+elif architecture == "resnet50":
+	model = resnet50(in_channels=channels, num_classes=classes)
+elif architecture == "resnet101":
+	model = resnet101(in_channels=channels, num_classes=classes)
+elif architecture == "resnet152":
+	model = resnet152(in_channels=channels, num_classes=classes)
+elif architecture == "vgg16":
+	model = vgg16(in_channels=channels, num_classes=classes)
+elif architecture == "densenet121":
+	model = densenet121(in_channels=channels, num_classes=classes)
+elif architecture == "densenet201":
+	model = densenet201(in_channels=channels, num_classes=classes)
+elif architecture == "efficientnet":
+	print("Not yet implemented efficiennet. Exiting...")
+	exit(0)
+else:
+	print("Architecture {} not found. Exiting...".format(architecture))
+	exit(0)
+
+print("")
+print("Training fog detection")
+print("----------------------")
+print("  Architecture:  {}".format(architecture))
+print("  Learning rate: {}".format(learningRate))
+print("  Epochs:        {}".format(nEpochs))
+print("  Batch size:    {}".format(batchSize))
+print("  Output path:   {}".format(output_file))
+print("")
+
 model = model.to(device)
 
 # Learning components
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=learningRate)
+criterion    = nn.CrossEntropyLoss()
+optimizer    = optim.Adam(model.parameters(), lr=learningRate)
 lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
 
 def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch, print_freq):
@@ -85,8 +155,8 @@ def evaluate(epoch, model, criterion, data_loader, device):
 ########
 
 # Directories
-targetDir = "/data1/fog/fognn/Dataset/24HOURS/TARGET"
-dataDir = "/data1/fog/fognn/Dataset/24HOURS/2D/"
+targetDir = "/data1/fog/fognn/Dataset/24HOURS/TARGET/"
+dataDir   = "/data1/fog/fognn/Dataset/24HOURS/2D/"
 
 # Key to extract numpy array from '.npz' data cube
 cubeKey = "arr_0"      # EX: `trainCubesNAM[0][cubeKey]`
@@ -95,14 +165,14 @@ cubeKey = "arr_0"      # EX: `trainCubesNAM[0][cubeKey]`
 initYear = 2009
 lastYear = 2020
 allYears = range(initYear, lastYear + 1)
-trainYears = [3, 4, 5, ]
-valYears   = [6, 7, 8, ]
-testYears  = [9, ]
+trainYears = [4,  5,  6,  7,  8]
+valYears   = [0,  1,  2,  3]
+testYears  = [9, 10, 11, ]
 
 # Filename templates
 pathPatternMix = "NETCDF_MIXED_CUBE_{}_24.npz"
 pathPatternNAM = "NETCDF_NAM_CUBE{}_24.npz"
-pathPatternSST = "NETCDF_SST_CUBE_{}_24.npz"
+pathPatternSST = "NETCDF_SST_CUBE_{}_24_scaled.npz"
 pathPatternTargets = "target{}_24.csv"
 
 # Generate list of target files
@@ -123,6 +193,13 @@ def binarizeTargets(targets):
 trainTargets = binarizeTargets(trainTargets)
 valTargets   = binarizeTargets(valTargets)
 testTargets  = binarizeTargets(testTargets)
+
+print("Train targets: {} fog , {} no fog".format(len(trainTargets[np.where(trainTargets ==  0)]),
+	len(trainTargets[np.where(trainTargets ==  1)])))
+print("Train targets: {} fog , {} no fog".format(len(valTargets[np.where(valTargets ==  0)]),
+	len(valTargets[np.where(valTargets ==  1)])))
+print("Train targets: {} fog , {} no fog".format(len(testTargets[np.where(testTargets ==  0)]),
+	len(testTargets[np.where(testTargets ==  1)])))
 
 # Print number of targets for each
 print("Number targets, train = {}, validate = {}, test = {}".format(
@@ -162,25 +239,42 @@ print("[Cube {i}] SST: instances = {n}, height = {h}, width = {w}, depth = {d}".
     i = idx, n = sampleCubeSST.shape[0], h = sampleCubeSST.shape[1],
     w = sampleCubeSST.shape[2], d = sampleCubeSST.shape[3]))
 
+
+# Resize SST
+
 # Concatenate cubes
-trainCubesAll = [list(np.concatenate((trainCubesMix[i][cubeKey], trainCubesNAM[i][cubeKey]), axis = 3)) for i in range(len(trainCubesMix))]
+trainCubesAll = [list(np.concatenate((trainCubesMix[i][cubeKey],
+                                      trainCubesNAM[i][cubeKey], 
+                                      trainCubesSST[i][cubeKey]),
+                      axis = 3)) for i in range(len(trainCubesMix))]
+
 trainCubesAll = [item for sublist in trainCubesAll for item in sublist]
-valCubesAll = [list(np.concatenate((valCubesMix[i][cubeKey], valCubesNAM[i][cubeKey]), axis = 3)) for i in range(len(valCubesMix))]
-valCubesAll = [item for sublist in valCubesAll for item in sublist]
-testCubesAll = [list(np.concatenate((testCubesMix[i][cubeKey], testCubesNAM[i][cubeKey]), axis = 3)) for i in range(len(testCubesMix))]
-testCubesAll = [item for sublist in testCubesAll for item in sublist]
+valCubesAll   = [list(np.concatenate((valCubesMix[i][cubeKey],
+                                      valCubesNAM[i][cubeKey],
+                                      valCubesSST[i][cubeKey]),
+                      axis = 3)) for i in range(len(valCubesMix))]
+valCubesAll   = [item for sublist in valCubesAll for item in sublist]
+testCubesAll  = [list(np.concatenate((testCubesMix[i][cubeKey], 
+                                      testCubesNAM[i][cubeKey], 
+                                      testCubesSST[i][cubeKey]),
+                      axis = 3)) for i in range(len(testCubesMix))]
+testCubesAll  = [item for sublist in testCubesAll for item in sublist]
 
 # Print shape of combined cube
 print("Combined: instances = {n}, height = {h}, width = {w}, depth = {d}".format(
     n = len(trainCubesAll), h = trainCubesAll[idx].shape[0],
     w = trainCubesAll[idx].shape[1], d = trainCubesAll[idx].shape[2]))
 
-# Convert to pytorch dataset
+# Standardize cube 
 train_x = np.array(trainCubesAll)
+#train_x = zscore(train_x.reshape(-1, 3)).reshape(train_x.shape)
+val_x   = np.array(valCubesAll)
+#val_x   = zscore(val_x.reshape(-1, 3)).reshape(val_x.shape)
+
+# Convert to pytorch dataset
 train_x = np.moveaxis(train_x, (0, 1, 2, 3), (0, 2, 3, 1))
 trainTensor_x = torch.Tensor(train_x)
 trainTensor_y = torch.Tensor(trainTargets)
-val_x = np.array(valCubesAll)
 val_x = np.moveaxis(val_x, (0, 1, 2, 3), (0, 2, 3, 1))
 valTensor_x = torch.Tensor(val_x)
 valTensor_y = torch.Tensor(valTargets)
@@ -195,7 +289,6 @@ trainLoader = DataLoader(trainData, batch_size=batchSize, shuffle=True)
 valData = TensorDataset(valTensor_x, valTensor_y) 
 valLoader = DataLoader(valData, batch_size=batchSize, shuffle=True)
 
-
 #########
 # Train #
 #########
@@ -204,4 +297,6 @@ for epoch in range(nEpochs):
     train_one_epoch(model, criterion, optimizer, trainLoader, device, epoch, printFreq)
     lr_scheduler.step()
     evaluate(epoch, model, criterion, valLoader, device)
-    #torch.save(model.state_dict(), os.path.join(url_models, "cls_epoch_{}.pth".format(epoch)))
+
+# Save model
+torch.save(model, output_file)
