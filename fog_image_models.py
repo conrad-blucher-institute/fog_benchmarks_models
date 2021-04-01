@@ -6,7 +6,7 @@ from torch.optim import lr_scheduler
 from torch.utils.data import TensorDataset, DataLoader
 # Torchsat
 from torchsat.models.classification.resnet import resnet18, resnet34, resnet50, resnet101, resnet152
-from torchsat.models.classification.vgg import vgg16
+from torchsat.models.classification.vgg import vgg16, vgg19
 from torchsat.models.classification.densenet import densenet121, densenet201
 # System
 import os
@@ -20,7 +20,7 @@ from optparse import OptionParser
 ###########
 parser = OptionParser()
 parser.add_option("-a", "--architecture",
-	help="Selected architecture (resnet18, resnet34, resnet50, resnet101, resnet152, vgg16, densenet121, densenet201)",
+	help="Selected architecture (resnet18, resnet34, resnet50, resnet101, resnet152, vgg16, vgg19, densenet121, densenet201)",
 	default="resnet18",
 )
 parser.add_option("-f", "--file",
@@ -43,6 +43,9 @@ parser.add_option("-i", "--identifier",
 	help="String to add to end of generated output filename",
 	default = "test",
 )
+parser.add_option("--no_sst", 
+	help="Do not use SST band",
+	default = False, action = "store_true")
 (options, args) = parser.parse_args()
 
 # Device for training
@@ -57,10 +60,16 @@ printFreq = 15
 # Selected architecture
 architecture = options.architecture
 
+# Use SST?
+useSST = not options.no_sst
+
 # Definitions
 width    = 32
 height   = 32
-channels = 385
+if useSST:
+    channels = 385
+else:
+    channels = 384
 classes  = 2
 
 # Hyperparameters
@@ -88,6 +97,8 @@ elif architecture == "resnet152":
 	model = resnet152(in_channels=channels, num_classes=classes)
 elif architecture == "vgg16":
 	model = vgg16(in_channels=channels, num_classes=classes)
+elif architecture == "vgg19":
+	model = vgg19(in_channels=channels, num_classes=classes
 elif architecture == "densenet121":
 	model = densenet121(in_channels=channels, num_classes=classes)
 elif architecture == "densenet201":
@@ -107,6 +118,7 @@ print("  Learning rate: {}".format(learningRate))
 print("  Epochs:        {}".format(nEpochs))
 print("  Batch size:    {}".format(batchSize))
 print("  Output path:   {}".format(output_file))
+print("  Using SST:     {}".format(str(useSST)))
 print("")
 
 model = model.to(device)
@@ -196,9 +208,9 @@ testTargets  = binarizeTargets(testTargets)
 
 print("Train targets: {} fog , {} no fog".format(len(trainTargets[np.where(trainTargets ==  0)]),
 	len(trainTargets[np.where(trainTargets ==  1)])))
-print("Train targets: {} fog , {} no fog".format(len(valTargets[np.where(valTargets ==  0)]),
+print("Validation targets: {} fog , {} no fog".format(len(valTargets[np.where(valTargets ==  0)]),
 	len(valTargets[np.where(valTargets ==  1)])))
-print("Train targets: {} fog , {} no fog".format(len(testTargets[np.where(testTargets ==  0)]),
+print("Test targets: {} fog , {} no fog".format(len(testTargets[np.where(testTargets ==  0)]),
 	len(testTargets[np.where(testTargets ==  1)])))
 
 # Print number of targets for each
@@ -217,9 +229,9 @@ trainCubesSST = [np.load(pathsSST[idx]) for idx in trainYears]
 valCubesMix   = [np.load(pathsMix[idx]) for idx in valYears]
 valCubesNAM   = [np.load(pathsNAM[idx]) for idx in valYears]
 valCubesSST   = [np.load(pathsSST[idx]) for idx in valYears]
-testCubesMix  = [np.load(pathsMix[idx]) for idx in testYears]
-testCubesNAM  = [np.load(pathsNAM[idx]) for idx in testYears]
-testCubesSST  = [np.load(pathsSST[idx]) for idx in testYears]
+#testCubesMix  = [np.load(pathsMix[idx]) for idx in testYears]
+#testCubesNAM  = [np.load(pathsNAM[idx]) for idx in testYears]
+#testCubesSST  = [np.load(pathsSST[idx]) for idx in testYears]
 
 # Open samples
 idx = 0
@@ -240,25 +252,39 @@ print("[Cube {i}] SST: instances = {n}, height = {h}, width = {w}, depth = {d}".
     w = sampleCubeSST.shape[2], d = sampleCubeSST.shape[3]))
 
 
-# Resize SST
-
 # Concatenate cubes
-trainCubesAll = [list(np.concatenate((trainCubesMix[i][cubeKey],
-                                      trainCubesNAM[i][cubeKey], 
-                                      trainCubesSST[i][cubeKey]),
-                      axis = 3)) for i in range(len(trainCubesMix))]
+if useSST:
+    trainCubesAll = [list(np.concatenate((trainCubesMix[i][cubeKey],
+                                          trainCubesNAM[i][cubeKey], 
+                                          trainCubesSST[i][cubeKey]),
+                          axis = 3)) for i in range(len(trainCubesMix))]
+    
+    trainCubesAll = [item for sublist in trainCubesAll for item in sublist]
+    valCubesAll   = [list(np.concatenate((valCubesMix[i][cubeKey],
+                                          valCubesNAM[i][cubeKey],
+                                          valCubesSST[i][cubeKey]),
+                          axis = 3)) for i in range(len(valCubesMix))]
+    valCubesAll   = [item for sublist in valCubesAll for item in sublist]
+    #testCubesAll  = [list(np.concatenate((testCubesMix[i][cubeKey], 
+    #                                      testCubesNAM[i][cubeKey], 
+    #                                      testCubesSST[i][cubeKey]),
+    #                      axis = 3)) for i in range(len(testCubesMix))]
+    #testCubesAll  = [item for sublist in testCubesAll for item in sublist]
+else:
+    trainCubesAll = [list(np.concatenate((trainCubesMix[i][cubeKey],
+                                          trainCubesNAM[i][cubeKey]), 
+                          axis = 3)) for i in range(len(trainCubesMix))]
+    
+    trainCubesAll = [item for sublist in trainCubesAll for item in sublist]
+    valCubesAll   = [list(np.concatenate((valCubesMix[i][cubeKey],
+                                          valCubesNAM[i][cubeKey]),
+                          axis = 3)) for i in range(len(valCubesMix))]
+    valCubesAll   = [item for sublist in valCubesAll for item in sublist]
+    #testCubesAll  = [list(np.concatenate((testCubesMix[i][cubeKey], 
+    #                                      testCubesNAM[i][cubeKey]), 
+    #                      axis = 3)) for i in range(len(testCubesMix))]
+    #testCubesAll  = [item for sublist in testCubesAll for item in sublist]
 
-trainCubesAll = [item for sublist in trainCubesAll for item in sublist]
-valCubesAll   = [list(np.concatenate((valCubesMix[i][cubeKey],
-                                      valCubesNAM[i][cubeKey],
-                                      valCubesSST[i][cubeKey]),
-                      axis = 3)) for i in range(len(valCubesMix))]
-valCubesAll   = [item for sublist in valCubesAll for item in sublist]
-testCubesAll  = [list(np.concatenate((testCubesMix[i][cubeKey], 
-                                      testCubesNAM[i][cubeKey], 
-                                      testCubesSST[i][cubeKey]),
-                      axis = 3)) for i in range(len(testCubesMix))]
-testCubesAll  = [item for sublist in testCubesAll for item in sublist]
 
 # Print shape of combined cube
 print("Combined: instances = {n}, height = {h}, width = {w}, depth = {d}".format(
