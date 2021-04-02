@@ -16,7 +16,7 @@ The purpose of this repo is to train several popular 2D CNN architectures for 24
 The following architectures were trained (use these exact names with the `-a` option to train the selected model):
 
 - `VGG16`, `VGG19`
-- `ResNet18`, `ResNet24`, `ResNet50`, `ResNet101`, `ResNet152`
+- `ResNet18`, `ResNet34`, `ResNet50`, `ResNet101`, `ResNet152`
 - `DenseNet101`, `DenseNet152`
 
 ## Guide
