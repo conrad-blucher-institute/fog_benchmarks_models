@@ -98,7 +98,7 @@ elif architecture == "resnet152":
 elif architecture == "vgg16":
 	model = vgg16(in_channels=channels, num_classes=classes)
 elif architecture == "vgg19":
-	model = vgg19(in_channels=channels, num_classes=classes
+	model = vgg19(in_channels=channels, num_classes=classes)
 elif architecture == "densenet121":
 	model = densenet121(in_channels=channels, num_classes=classes)
 elif architecture == "densenet201":
