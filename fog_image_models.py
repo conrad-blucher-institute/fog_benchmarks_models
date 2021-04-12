@@ -23,6 +23,14 @@ parser.add_option("-a", "--architecture",
 	help="Selected architecture (resnet18, resnet34, resnet50, resnet101, resnet152, vgg16, vgg19, densenet121, densenet201)",
 	default="resnet18",
 )
+parser.add_option("-t", "--target_dir",
+	help="Path to directory with labeled target data",
+	default="/data1/fog/fognn/Dataset/24HOURS/TARGET/",
+)
+parser.add_option("-d", "--data_dir",
+	help="Path to directory with input rasters",
+	default="/data1/fog/fognn/Dataset/24HOURS/2D/",
+)
 parser.add_option("-f", "--file",
 	help="Path to save trained model",
 	default = None,
@@ -80,8 +88,10 @@ batchSize    = options.batch_size
 # Path to save model
 output_file = options.file
 if output_file is None:
+	# Default directory
+	outdir = "out/results/"
 	# Path based on params
-	output_file = "fog-{a}__lr{l}__e{e}__b{b}__{i}.pt".format(
+	output_file = outdir + "/fog-{a}__lr{l}__e{e}__b{b}__{i}.pt".format(
 		a=architecture, l=learningRate, e=nEpochs, b=batchSize, i=options.identifier)
 
 # Load architecture
@@ -167,13 +177,14 @@ def evaluate(epoch, model, criterion, data_loader, device):
 ########
 
 # Directories
-targetDir = "/data1/fog/fognn/Dataset/24HOURS/TARGET/"
-dataDir   = "/data1/fog/fognn/Dataset/24HOURS/2D/"
+targetDir = options.target_dir
+dataDir   = options.data_dir
 
 # Key to extract numpy array from '.npz' data cube
 cubeKey = "arr_0"      # EX: `trainCubesNAM[0][cubeKey]`
 
 # Split years into train, validation, and test
+# Bad: data completely inflexible
 initYear = 2009
 lastYear = 2020
 allYears = range(initYear, lastYear + 1)
@@ -182,6 +193,7 @@ valYears   = [0,  1,  2,  3]
 testYears  = [9, 10, 11, ]
 
 # Filename templates
+# Bad: data completely inflexible
 pathPatternMix = "NETCDF_MIXED_CUBE_{}_24.npz"
 pathPatternNAM = "NETCDF_NAM_CUBE{}_24.npz"
 pathPatternSST = "NETCDF_SST_CUBE_{}_24_scaled.npz"
@@ -251,7 +263,6 @@ print("[Cube {i}] SST: instances = {n}, height = {h}, width = {w}, depth = {d}".
     i = idx, n = sampleCubeSST.shape[0], h = sampleCubeSST.shape[1],
     w = sampleCubeSST.shape[2], d = sampleCubeSST.shape[3]))
 
-
 # Concatenate cubes
 if useSST:
     trainCubesAll = [list(np.concatenate((trainCubesMix[i][cubeKey],
@@ -265,11 +276,6 @@ if useSST:
                                           valCubesSST[i][cubeKey]),
                           axis = 3)) for i in range(len(valCubesMix))]
     valCubesAll   = [item for sublist in valCubesAll for item in sublist]
-    #testCubesAll  = [list(np.concatenate((testCubesMix[i][cubeKey], 
-    #                                      testCubesNAM[i][cubeKey], 
-    #                                      testCubesSST[i][cubeKey]),
-    #                      axis = 3)) for i in range(len(testCubesMix))]
-    #testCubesAll  = [item for sublist in testCubesAll for item in sublist]
 else:
     trainCubesAll = [list(np.concatenate((trainCubesMix[i][cubeKey],
                                           trainCubesNAM[i][cubeKey]), 
@@ -280,11 +286,6 @@ else:
                                           valCubesNAM[i][cubeKey]),
                           axis = 3)) for i in range(len(valCubesMix))]
     valCubesAll   = [item for sublist in valCubesAll for item in sublist]
-    #testCubesAll  = [list(np.concatenate((testCubesMix[i][cubeKey], 
-    #                                      testCubesNAM[i][cubeKey]), 
-    #                      axis = 3)) for i in range(len(testCubesMix))]
-    #testCubesAll  = [item for sublist in testCubesAll for item in sublist]
-
 
 # Print shape of combined cube
 print("Combined: instances = {n}, height = {h}, width = {w}, depth = {d}".format(
@@ -304,11 +305,6 @@ trainTensor_y = torch.Tensor(trainTargets)
 val_x = np.moveaxis(val_x, (0, 1, 2, 3), (0, 2, 3, 1))
 valTensor_x = torch.Tensor(val_x)
 valTensor_y = torch.Tensor(valTargets)
-
-print(trainTensor_x.shape)
-print(trainTensor_y.shape)
-print(valTensor_x.shape)
-print(valTensor_y.shape)
 
 trainData = TensorDataset(trainTensor_x, trainTensor_y) 
 trainLoader = DataLoader(trainData, batch_size=batchSize, shuffle=True)

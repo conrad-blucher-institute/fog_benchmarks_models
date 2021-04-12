@@ -8,7 +8,8 @@ source fog-bmark/bin/activate
 # Definitions
 CMD_TRAIN="python fog_image_models.py "
 CMD_TEST="python fog_image_metrics.py "
-LOGDIR="logs/"
+LOGDIR="out/logs/"
+RESDIR="out/results/"
 EPOCHS=100
 
 #########
@@ -75,56 +76,56 @@ $CMD_TRAIN -a densenet201 -e $EPOCHS"" -i 5n > $LOGDIR""/densenet201_5.txt
 ########
 
 # Resnet-18
-$CMD_TEST -m fog-resnet18__lr0.1__e$EPOCHS""__b64__1.pt > fog-resnet18__lr0.1__e$EPOCHS""__b64__1.csv
-$CMD_TEST -m fog-resnet18__lr0.1__e$EPOCHS""__b64__2.pt > fog-resnet18__lr0.1__e$EPOCHS""__b64__2.csv
-$CMD_TEST -m fog-resnet18__lr0.1__e$EPOCHS""__b64__3.pt > fog-resnet18__lr0.1__e$EPOCHS""__b64__3.csv
-$CMD_TEST -m fog-resnet18__lr0.1__e$EPOCHS""__b64__4.pt > fog-resnet18__lr0.1__e$EPOCHS""__b64__4.csv
-$CMD_TEST -m fog-resnet18__lr0.1__e$EPOCHS""__b64__5.pt > fog-resnet18__lr0.1__e$EPOCHS""__b64__5.csv
+$CMD_TEST -m $RESDIR""/fog-resnet18__lr0.1__e$EPOCHS""__b64__1.pt > $RESDIR""/fog-resnet18__lr0.1__e$EPOCHS""__b64__1.csv
+$CMD_TEST -m $RESDIR""/fog-resnet18__lr0.1__e$EPOCHS""__b64__2.pt > $RESDIR""/fog-resnet18__lr0.1__e$EPOCHS""__b64__2.csv
+$CMD_TEST -m $RESDIR""/fog-resnet18__lr0.1__e$EPOCHS""__b64__3.pt > $RESDIR""/fog-resnet18__lr0.1__e$EPOCHS""__b64__3.csv
+$CMD_TEST -m $RESDIR""/fog-resnet18__lr0.1__e$EPOCHS""__b64__4.pt > $RESDIR""/fog-resnet18__lr0.1__e$EPOCHS""__b64__4.csv
+$CMD_TEST -m $RESDIR""/fog-resnet18__lr0.1__e$EPOCHS""__b64__5.pt > $RESDIR""/fog-resnet18__lr0.1__e$EPOCHS""__b64__5.csv
 # Resnet-34
-$CMD_TEST -m fog-resnet35__lr0.1__e$EPOCHS""__b64__1.pt > fog-resnet35__lr0.1__e$EPOCHS""__b64__1.csv
-$CMD_TEST -m fog-resnet35__lr0.1__e$EPOCHS""__b64__2.pt > fog-resnet35__lr0.1__e$EPOCHS""__b64__2.csv
-$CMD_TEST -m fog-resnet35__lr0.1__e$EPOCHS""__b64__3.pt > fog-resnet35__lr0.1__e$EPOCHS""__b64__3.csv
-$CMD_TEST -m fog-resnet35__lr0.1__e$EPOCHS""__b64__4.pt > fog-resnet35__lr0.1__e$EPOCHS""__b64__4.csv
-$CMD_TEST -m fog-resnet35__lr0.1__e$EPOCHS""__b64__5.pt > fog-resnet35__lr0.1__e$EPOCHS""__b64__5.csv
+$CMD_TEST -m $RESDIR""/fog-resnet34__lr0.1__e$EPOCHS""__b64__1.pt > $RESDIR""/fog-resnet34__lr0.1__e$EPOCHS""__b64__1.csv
+$CMD_TEST -m $RESDIR""/fog-resnet34__lr0.1__e$EPOCHS""__b64__2.pt > $RESDIR""/fog-resnet34__lr0.1__e$EPOCHS""__b64__2.csv
+$CMD_TEST -m $RESDIR""/fog-resnet34__lr0.1__e$EPOCHS""__b64__3.pt > $RESDIR""/fog-resnet34__lr0.1__e$EPOCHS""__b64__3.csv
+$CMD_TEST -m $RESDIR""/fog-resnet34__lr0.1__e$EPOCHS""__b64__4.pt > $RESDIR""/fog-resnet34__lr0.1__e$EPOCHS""__b64__4.csv
+$CMD_TEST -m $RESDIR""/fog-resnet34__lr0.1__e$EPOCHS""__b64__5.pt > $RESDIR""/fog-resnet34__lr0.1__e$EPOCHS""__b64__5.csv
 # Resnet-50
-$CMD_TEST -m fog-resnet50__lr0.1__e$EPOCHS""__b64__1.pt > fog-resnet50__lr0.1__e$EPOCHS""__b64__1.csv
-$CMD_TEST -m fog-resnet50__lr0.1__e$EPOCHS""__b64__2.pt > fog-resnet50__lr0.1__e$EPOCHS""__b64__2.csv
-$CMD_TEST -m fog-resnet50__lr0.1__e$EPOCHS""__b64__3.pt > fog-resnet50__lr0.1__e$EPOCHS""__b64__3.csv
-$CMD_TEST -m fog-resnet50__lr0.1__e$EPOCHS""__b64__4.pt > fog-resnet50__lr0.1__e$EPOCHS""__b64__4.csv
-$CMD_TEST -m fog-resnet50__lr0.1__e$EPOCHS""__b64__5.pt > fog-resnet50__lr0.1__e$EPOCHS""__b64__5.csv
+$CMD_TEST -m $RESDIR""/fog-resnet50__lr0.1__e$EPOCHS""__b64__1.pt > $RESDIR""/fog-resnet50__lr0.1__e$EPOCHS""__b64__1.csv
+$CMD_TEST -m $RESDIR""/fog-resnet50__lr0.1__e$EPOCHS""__b64__2.pt > $RESDIR""/fog-resnet50__lr0.1__e$EPOCHS""__b64__2.csv
+$CMD_TEST -m $RESDIR""/fog-resnet50__lr0.1__e$EPOCHS""__b64__3.pt > $RESDIR""/fog-resnet50__lr0.1__e$EPOCHS""__b64__3.csv
+$CMD_TEST -m $RESDIR""/fog-resnet50__lr0.1__e$EPOCHS""__b64__4.pt > $RESDIR""/fog-resnet50__lr0.1__e$EPOCHS""__b64__4.csv
+$CMD_TEST -m $RESDIR""/fog-resnet50__lr0.1__e$EPOCHS""__b64__5.pt > $RESDIR""/fog-resnet50__lr0.1__e$EPOCHS""__b64__5.csv
 # Resnet-101
-$CMD_TEST -m fog-resnet101__lr0.1__e$EPOCHS""__b64__1.pt > fog-resnet101__lr0.1__e$EPOCHS""__b64__1.csv
-$CMD_TEST -m fog-resnet101__lr0.1__e$EPOCHS""__b64__2.pt > fog-resnet101__lr0.1__e$EPOCHS""__b64__2.csv
-$CMD_TEST -m fog-resnet101__lr0.1__e$EPOCHS""__b64__3.pt > fog-resnet101__lr0.1__e$EPOCHS""__b64__3.csv
-$CMD_TEST -m fog-resnet101__lr0.1__e$EPOCHS""__b64__4.pt > fog-resnet101__lr0.1__e$EPOCHS""__b64__4.csv
-$CMD_TEST -m fog-resnet101__lr0.1__e$EPOCHS""__b64__5.pt > fog-resnet101__lr0.1__e$EPOCHS""__b64__5.csv
+$CMD_TEST -m $RESDIR""/fog-resnet101__lr0.1__e$EPOCHS""__b64__1.pt > $RESDIR""/fog-resnet101__lr0.1__e$EPOCHS""__b64__1.csv
+$CMD_TEST -m $RESDIR""/fog-resnet101__lr0.1__e$EPOCHS""__b64__2.pt > $RESDIR""/fog-resnet101__lr0.1__e$EPOCHS""__b64__2.csv
+$CMD_TEST -m $RESDIR""/fog-resnet101__lr0.1__e$EPOCHS""__b64__3.pt > $RESDIR""/fog-resnet101__lr0.1__e$EPOCHS""__b64__3.csv
+$CMD_TEST -m $RESDIR""/fog-resnet101__lr0.1__e$EPOCHS""__b64__4.pt > $RESDIR""/fog-resnet101__lr0.1__e$EPOCHS""__b64__4.csv
+$CMD_TEST -m $RESDIR""/fog-resnet101__lr0.1__e$EPOCHS""__b64__5.pt > $RESDIR""/fog-resnet101__lr0.1__e$EPOCHS""__b64__5.csv
 # Resnet-152
-$CMD_TEST -m fog-resnet152__lr0.1__e$EPOCHS""__b64__1.pt > fog-resnet152__lr0.1__e$EPOCHS""__b64__1.csv
-$CMD_TEST -m fog-resnet152__lr0.1__e$EPOCHS""__b64__2.pt > fog-resnet152__lr0.1__e$EPOCHS""__b64__2.csv
-$CMD_TEST -m fog-resnet152__lr0.1__e$EPOCHS""__b64__3.pt > fog-resnet152__lr0.1__e$EPOCHS""__b64__3.csv
-$CMD_TEST -m fog-resnet152__lr0.1__e$EPOCHS""__b64__4.pt > fog-resnet152__lr0.1__e$EPOCHS""__b64__4.csv
-$CMD_TEST -m fog-resnet152__lr0.1__e$EPOCHS""__b64__5.pt > fog-resnet152__lr0.1__e$EPOCHS""__b64__5.csv
+$CMD_TEST -m $RESDIR""/fog-resnet152__lr0.1__e$EPOCHS""__b64__1.pt > $RESDIR""/fog-resnet152__lr0.1__e$EPOCHS""__b64__1.csv
+$CMD_TEST -m $RESDIR""/fog-resnet152__lr0.1__e$EPOCHS""__b64__2.pt > $RESDIR""/fog-resnet152__lr0.1__e$EPOCHS""__b64__2.csv
+$CMD_TEST -m $RESDIR""/fog-resnet152__lr0.1__e$EPOCHS""__b64__3.pt > $RESDIR""/fog-resnet152__lr0.1__e$EPOCHS""__b64__3.csv
+$CMD_TEST -m $RESDIR""/fog-resnet152__lr0.1__e$EPOCHS""__b64__4.pt > $RESDIR""/fog-resnet152__lr0.1__e$EPOCHS""__b64__4.csv
+$CMD_TEST -m $RESDIR""/fog-resnet152__lr0.1__e$EPOCHS""__b64__5.pt > $RESDIR""/fog-resnet152__lr0.1__e$EPOCHS""__b64__5.csv
 # VGG-16
-$CMD_TEST -m fog-vgg16__lr0.1__e$EPOCHS""__b64__1.pt > fog-vgg16__lr0.1__e$EPOCHS""__b64__1.csv
-$CMD_TEST -m fog-vgg16__lr0.1__e$EPOCHS""__b64__2.pt > fog-vgg16__lr0.1__e$EPOCHS""__b64__2.csv
-$CMD_TEST -m fog-vgg16__lr0.1__e$EPOCHS""__b64__3.pt > fog-vgg16__lr0.1__e$EPOCHS""__b64__3.csv
-$CMD_TEST -m fog-vgg16__lr0.1__e$EPOCHS""__b64__4.pt > fog-vgg16__lr0.1__e$EPOCHS""__b64__4.csv
-$CMD_TEST -m fog-vgg16__lr0.1__e$EPOCHS""__b64__5.pt > fog-vgg16__lr0.1__e$EPOCHS""__b64__5.csv
+$CMD_TEST -m $RESDIR""/fog-vgg16__lr0.1__e$EPOCHS""__b64__1.pt > $RESDIR""/fog-vgg16__lr0.1__e$EPOCHS""__b64__1.csv
+$CMD_TEST -m $RESDIR""/fog-vgg16__lr0.1__e$EPOCHS""__b64__2.pt > $RESDIR""/fog-vgg16__lr0.1__e$EPOCHS""__b64__2.csv
+$CMD_TEST -m $RESDIR""/fog-vgg16__lr0.1__e$EPOCHS""__b64__3.pt > $RESDIR""/fog-vgg16__lr0.1__e$EPOCHS""__b64__3.csv
+$CMD_TEST -m $RESDIR""/fog-vgg16__lr0.1__e$EPOCHS""__b64__4.pt > $RESDIR""/fog-vgg16__lr0.1__e$EPOCHS""__b64__4.csv
+$CMD_TEST -m $RESDIR""/fog-vgg16__lr0.1__e$EPOCHS""__b64__5.pt > $RESDIR""/fog-vgg16__lr0.1__e$EPOCHS""__b64__5.csv
 # VGG-19
-$CMD_TEST -m fog-vgg19__lr0.1__e$EPOCHS""__b64__1.pt > fog-vgg19__lr0.1__e$EPOCHS""__b64__1.csv
-$CMD_TEST -m fog-vgg19__lr0.1__e$EPOCHS""__b64__2.pt > fog-vgg19__lr0.1__e$EPOCHS""__b64__2.csv
-$CMD_TEST -m fog-vgg19__lr0.1__e$EPOCHS""__b64__3.pt > fog-vgg19__lr0.1__e$EPOCHS""__b64__3.csv
-$CMD_TEST -m fog-vgg19__lr0.1__e$EPOCHS""__b64__4.pt > fog-vgg19__lr0.1__e$EPOCHS""__b64__4.csv
-$CMD_TEST -m fog-vgg19__lr0.1__e$EPOCHS""__b64__5.pt > fog-vgg19__lr0.1__e$EPOCHS""__b64__5.csv
+$CMD_TEST -m $RESDIR""/fog-vgg19__lr0.1__e$EPOCHS""__b64__1.pt > $RESDIR""/fog-vgg19__lr0.1__e$EPOCHS""__b64__1.csv
+$CMD_TEST -m $RESDIR""/fog-vgg19__lr0.1__e$EPOCHS""__b64__2.pt > $RESDIR""/fog-vgg19__lr0.1__e$EPOCHS""__b64__2.csv
+$CMD_TEST -m $RESDIR""/fog-vgg19__lr0.1__e$EPOCHS""__b64__3.pt > $RESDIR""/fog-vgg19__lr0.1__e$EPOCHS""__b64__3.csv
+$CMD_TEST -m $RESDIR""/fog-vgg19__lr0.1__e$EPOCHS""__b64__4.pt > $RESDIR""/fog-vgg19__lr0.1__e$EPOCHS""__b64__4.csv
+$CMD_TEST -m $RESDIR""/fog-vgg19__lr0.1__e$EPOCHS""__b64__5.pt > $RESDIR""/fog-vgg19__lr0.1__e$EPOCHS""__b64__5.csv
 # Densenet-121
-$CMD_TEST -m fog-densenet121__lr0.1__e$EPOCHS""__b64__1.pt > fog-densenet121__lr0.1__e$EPOCHS""__b64__1.csv
-$CMD_TEST -m fog-densenet121__lr0.1__e$EPOCHS""__b64__2.pt > fog-densenet121__lr0.1__e$EPOCHS""__b64__2.csv
-$CMD_TEST -m fog-densenet121__lr0.1__e$EPOCHS""__b64__3.pt > fog-densenet121__lr0.1__e$EPOCHS""__b64__3.csv
-$CMD_TEST -m fog-densenet121__lr0.1__e$EPOCHS""__b64__4.pt > fog-densenet121__lr0.1__e$EPOCHS""__b64__4.csv
-$CMD_TEST -m fog-densenet121__lr0.1__e$EPOCHS""__b64__5.pt > fog-densenet121__lr0.1__e$EPOCHS""__b64__5.csv
+$CMD_TEST -m $RESDIR""/fog-densenet121__lr0.1__e$EPOCHS""__b64__1.pt > $RESDIR""/fog-densenet121__lr0.1__e$EPOCHS""__b64__1.csv
+$CMD_TEST -m $RESDIR""/fog-densenet121__lr0.1__e$EPOCHS""__b64__2.pt > $RESDIR""/fog-densenet121__lr0.1__e$EPOCHS""__b64__2.csv
+$CMD_TEST -m $RESDIR""/fog-densenet121__lr0.1__e$EPOCHS""__b64__3.pt > $RESDIR""/fog-densenet121__lr0.1__e$EPOCHS""__b64__3.csv
+$CMD_TEST -m $RESDIR""/fog-densenet121__lr0.1__e$EPOCHS""__b64__4.pt > $RESDIR""/fog-densenet121__lr0.1__e$EPOCHS""__b64__4.csv
+$CMD_TEST -m $RESDIR""/fog-densenet121__lr0.1__e$EPOCHS""__b64__5.pt > $RESDIR""/fog-densenet121__lr0.1__e$EPOCHS""__b64__5.csv
 # DenseNet-201
-$CMD_TEST -m fog-densenet201__lr0.1__e$EPOCHS""__b64__1.pt > fog-densenet201__lr0.1__e$EPOCHS""__b64__1.csv
-$CMD_TEST -m fog-densenet201__lr0.1__e$EPOCHS""__b64__2.pt > fog-densenet201__lr0.1__e$EPOCHS""__b64__2.csv
-$CMD_TEST -m fog-densenet201__lr0.1__e$EPOCHS""__b64__3.pt > fog-densenet201__lr0.1__e$EPOCHS""__b64__3.csv
-$CMD_TEST -m fog-densenet201__lr0.1__e$EPOCHS""__b64__4.pt > fog-densenet201__lr0.1__e$EPOCHS""__b64__4.csv
-$CMD_TEST -m fog-densenet201__lr0.1__e$EPOCHS""__b64__5.pt > fog-densenet201__lr0.1__e$EPOCHS""__b64__5.csv
+$CMD_TEST -m $RESDIR""/fog-densenet201__lr0.1__e$EPOCHS""__b64__1.pt > $RESDIR""/fog-densenet201__lr0.1__e$EPOCHS""__b64__1.csv
+$CMD_TEST -m $RESDIR""/fog-densenet201__lr0.1__e$EPOCHS""__b64__2.pt > $RESDIR""/fog-densenet201__lr0.1__e$EPOCHS""__b64__2.csv
+$CMD_TEST -m $RESDIR""/fog-densenet201__lr0.1__e$EPOCHS""__b64__3.pt > $RESDIR""/fog-densenet201__lr0.1__e$EPOCHS""__b64__3.csv
+$CMD_TEST -m $RESDIR""/fog-densenet201__lr0.1__e$EPOCHS""__b64__4.pt > $RESDIR""/fog-densenet201__lr0.1__e$EPOCHS""__b64__4.csv
+$CMD_TEST -m $RESDIR""/fog-densenet201__lr0.1__e$EPOCHS""__b64__5.pt > $RESDIR""/fog-densenet201__lr0.1__e$EPOCHS""__b64__5.csv
