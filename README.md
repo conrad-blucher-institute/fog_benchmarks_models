@@ -19,11 +19,27 @@ The following architectures were trained (use these exact names with the `-a` op
 - `ResNet18`, `ResNet34`, `ResNet50`, `ResNet101`, `ResNet152`
 - `DenseNet101`, `DenseNet152`
 
+## Note
+
+Due to the file sizes, `out/results` has each trained model's metric CSV, but not the saved model weights. 
+
+## Repo organization
+
+- fog-benchmark-models:
+	- `fog_image_models.py`: training script
+	- `fog_image_metrics.py`: testing (metrics) script
+	- `shrink_SST.py`: resize 128x12 Sea Surface Temperature raster to 32x32
+	- `run_fog_image_models.bash`: run all trials for FogNet comparison
+	- `plotLearningCurve.py`: generates learning curve plot for the paper
+	- `README.md`: this document
+	- `venv`: python2.7.6 virtual environment
+	- `out`: output directoryy
+		- `out/fog_benchmark_runs.csv`: metrics comparison of various models/trials for FogNet comparison
+		- `out/logs`: directory for piping the training script output
+		- `out/results`: directory for model weights and metrics for each model trained
+		- `out/img`: directory for plots 
+
 ## Guide
-
-**Active python3 virtual environment**
-
-    source fog-bmark/bin/activate
 
 **Train a model:**
 
@@ -52,22 +68,8 @@ You will need to run this if the resized SST is not already available.
 
 ## Todo 
 
-- [ ] Add final benchmark result spreadsheet to repo
+- [X] Add final benchmark result spreadsheet to repo
 - [ ] Remove hard-coded paths to the FogNet data folders
 - [ ] Add references to the FogNet papers, when published
 - [ ] Make repo public when appropriate to do so
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
