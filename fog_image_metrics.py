@@ -22,14 +22,6 @@ def getPredictions(model, data_loader, device):
             rawOutputs.append(output)
     return trueLabels, predLabels, rawOutputs
 
-parser = OptionParser()
-parser.add_option("-m", "--model",
-	help="Path to tested model",
-	default=None)
-parser.add_option("--no_sst",
-	help="Skip using SST band",
-	default=False, action="store_true")
-(options, args) = parser.parse_args()
 
 # Calculate metrics
 def calcMetrics(y, ypred):
@@ -88,6 +80,32 @@ def findOptimalThreshold(y, yprob, baseMetrics):
 
     return bestMetrics, bestThr
 
+# Options
+parser = OptionParser()
+parser.add_option("-m", "--model",
+	help="Path to tested model",
+	default=None)
+parser.add_option("-t", "--target_dir",
+	help="Path to directory with labeled target data",
+	default="/data1/fog/fognn/Dataset/24HOURS/TARGET/",
+)
+parser.add_option("-d", "--data_dir",
+	help="Path to directory with input rasters",
+	default="/data1/fog/fognn/Dataset/24HOURS/2D/",
+)
+parser.add_option("-y", "--years",
+	help="Comma-delimited list of test years",
+	default="9,10,11",
+)
+parser.add_option("-p", "--predictions_file",
+	help="Path to store predictions",
+	default=None,
+)
+parser.add_option("--no_sst",
+	help="Skip using SST band",
+	default=False, action="store_true",
+)
+(options, args) = parser.parse_args()
 
 # Load model
 modelPath = options.model
@@ -97,9 +115,11 @@ useSST = not options.no_sst
 
 batchSize = 64
 
+predsFile = options.predictions_file
+
 # Directories
-targetDir = "/data1/fog/fognn/Dataset/24HOURS/TARGET/"
-dataDir   = "/data1/fog/fognn/Dataset/24HOURS/2D/"
+targetDir = options.target_dir
+dataDir   = options.data_dir
 
 # Key to extract numpy array from '.npz' data cube
 cubeKey = "arr_0"      # EX: `testCubesNAM[0][cubeKey]`
@@ -108,7 +128,7 @@ cubeKey = "arr_0"      # EX: `testCubesNAM[0][cubeKey]`
 initYear = 2009
 lastYear = 2020
 allYears = range(initYear, lastYear + 1)
-testYears  = [9, 10, 11 ]
+testYears  = np.array(options.years.split(",")).astype(np.int)
 
 # Filename templates
 pathPatternMix = "NETCDF_MIXED_CUBE_{}_24.npz"
@@ -169,10 +189,24 @@ y = np.array([int(item.item()) for sublist in trueLabels for item in sublist])
 ypred = np.array([int(item.item()) for sublist in predLabels for item in sublist])
 yraw = [t.cpu() for t in rawOutputs]
 yraw = np.concatenate([t.numpy() for t in yraw])
-yprob = softmax(yraw, axis=1)[:, 0]
+yprobs = softmax(yraw, axis=1)
+yprob = yprobs[:, 0]
 
-#print("Test predictions: {} fog , {} no fog".format(len(ypred[np.where(ypred ==  0)]),
-#                                                    len(ypred[np.where(ypred ==  1)])))
+if predsFile is not None:
+    # Save the predictions
+
+    # Get dates (identify data)
+    dates = []
+    for year in testYears:
+        dates.extend(pd.read_csv(pathsTargets[year])["Date"].values)
+
+    # Combine into csv
+    dfPred = pd.DataFrame(
+        np.column_stack([dates, yprobs[:, 0], yprobs[:, 1]]),
+        columns=["date", "prob 0", "prob 1"]
+    )
+
+    dfPred.to_csv(predsFile, index=False, header=False)
 
 # Calculate base metrics
 baseMetrics = calcMetrics(y, ypred)
