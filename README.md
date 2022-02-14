@@ -33,7 +33,6 @@ The saved weights, along with all other outputs generated for the **FogNet Ablat
 	- `run_fog_image_models.bash`: run all trials for FogNet comparison
 	- `plotLearningCurve.py`: generates learning curve plot for the paper
 	- `README.md`: this document
-	- `venv`: python2.7.6 virtual environment
 	- `out`: output directoryy
 		- `out/fog_benchmark_runs.csv`: metrics comparison of various models/trials for FogNet comparison
 		- `out/logs`: directory for piping the training script output
@@ -62,16 +61,16 @@ First, choose where to install the data: we will refer to this directory as `$DA
     python fog_image_models.py -a $ARCHITECTURE -e $EPOCHS -i $UNIQ_ID -d $DATA_DIR -t $TARGET_DIR
 
     # Example:
-    python fog_image_models.py -a resnet34 -e 100 -i 1 -d $DATASETS/24HOURS/2D/ -t $DATASETS/24HOURS/TARGET/
+    python fog_image_models.py -a resnet34 -e 100 -i TEST -d $DATASETS/24HOURS/2D/ -t $DATASETS/24HOURS/TARGET/
     
-    # Saved model path:  out/results/fog-resnet34__lr0.1__e100__b64__1.pt
+    # Saved model path:  out/results/fog-resnet34__lr0.1__e100__b64__TEST.pt
 
 **Test a model:**
 
-    python fog_image_metrics.py -m $MODEL 
+    python fog_image_metrics.py -d $DATA_DIR -t $TARGET_DIR -m $MODEL 
 
     # Example:
-    python fog_image_metrics.py fog-resnet34__lr0.1__e100__b64__1.pt
+    python fog_image_metrics.py -d $DATASETS/24HOURS/2D/ -t $DATASETS/24HOURS/TARGET/ -m out/results/fog-resnet34__lr0.1__e100__b64__TEST.pt
 
 
 **Resize sea surface temperature (SST) band:**
