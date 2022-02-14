@@ -3,7 +3,7 @@
 # For an _under review_ publication
 
 # Activate virtual environment
-source fog-bmark/bin/activate
+source venv/bin/activate
 
 # Definitions
 DATADIR="/data1/fog/fognn/Dataset/24HOURS/"  # See README to download data. Set path to local.
