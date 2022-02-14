@@ -1,2 +1,3 @@
+venv/
 fog-bmark/
 out/results/*.pt
