@@ -15,6 +15,9 @@ import numpy as np
 import pandas as pd
 from optparse import OptionParser
 
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
 ###########
 # Options #
 ###########
@@ -51,7 +54,7 @@ parser.add_option("-i", "--identifier",
 	help="String to add to end of generated output filename",
 	default = "test",
 )
-parser.add_option("--no_sst", 
+parser.add_option("--no_sst",
 	help="Do not use SST band",
 	default = False, action = "store_true")
 (options, args) = parser.parse_args()
@@ -124,12 +127,14 @@ print("")
 print("Training fog detection")
 print("----------------------")
 print("  Architecture:  {}".format(architecture))
+print("    Num. trainable params: {}".format(count_parameters(model)))
 print("  Learning rate: {}".format(learningRate))
 print("  Epochs:        {}".format(nEpochs))
 print("  Batch size:    {}".format(batchSize))
 print("  Output path:   {}".format(output_file))
 print("  Using SST:     {}".format(str(useSST)))
 print("")
+
 
 model = model.to(device)
 
@@ -266,10 +271,10 @@ print("[Cube {i}] SST: instances = {n}, height = {h}, width = {w}, depth = {d}".
 # Concatenate cubes
 if useSST:
     trainCubesAll = [list(np.concatenate((trainCubesMix[i][cubeKey],
-                                          trainCubesNAM[i][cubeKey], 
+                                          trainCubesNAM[i][cubeKey],
                                           trainCubesSST[i][cubeKey]),
                           axis = 3)) for i in range(len(trainCubesMix))]
-    
+
     trainCubesAll = [item for sublist in trainCubesAll for item in sublist]
     valCubesAll   = [list(np.concatenate((valCubesMix[i][cubeKey],
                                           valCubesNAM[i][cubeKey],
@@ -278,9 +283,9 @@ if useSST:
     valCubesAll   = [item for sublist in valCubesAll for item in sublist]
 else:
     trainCubesAll = [list(np.concatenate((trainCubesMix[i][cubeKey],
-                                          trainCubesNAM[i][cubeKey]), 
+                                          trainCubesNAM[i][cubeKey]),
                           axis = 3)) for i in range(len(trainCubesMix))]
-    
+
     trainCubesAll = [item for sublist in trainCubesAll for item in sublist]
     valCubesAll   = [list(np.concatenate((valCubesMix[i][cubeKey],
                                           valCubesNAM[i][cubeKey]),
@@ -292,7 +297,7 @@ print("Combined: instances = {n}, height = {h}, width = {w}, depth = {d}".format
     n = len(trainCubesAll), h = trainCubesAll[idx].shape[0],
     w = trainCubesAll[idx].shape[1], d = trainCubesAll[idx].shape[2]))
 
-# Standardize cube 
+# Standardize cube
 train_x = np.array(trainCubesAll)
 #train_x = zscore(train_x.reshape(-1, 3)).reshape(train_x.shape)
 val_x   = np.array(valCubesAll)
@@ -306,9 +311,9 @@ val_x = np.moveaxis(val_x, (0, 1, 2, 3), (0, 2, 3, 1))
 valTensor_x = torch.Tensor(val_x)
 valTensor_y = torch.Tensor(valTargets)
 
-trainData = TensorDataset(trainTensor_x, trainTensor_y) 
+trainData = TensorDataset(trainTensor_x, trainTensor_y)
 trainLoader = DataLoader(trainData, batch_size=batchSize, shuffle=True)
-valData = TensorDataset(valTensor_x, valTensor_y) 
+valData = TensorDataset(valTensor_x, valTensor_y)
 valLoader = DataLoader(valData, batch_size=batchSize, shuffle=True)
 
 #########
@@ -316,7 +321,9 @@ valLoader = DataLoader(valData, batch_size=batchSize, shuffle=True)
 #########
 
 for epoch in range(nEpochs):
+    t0 = time.time()
     train_one_epoch(model, criterion, optimizer, trainLoader, device, epoch, printFreq)
+    print(time.time() - t0)
     lr_scheduler.step()
     evaluate(epoch, model, criterion, valLoader, device)
 
