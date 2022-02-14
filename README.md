@@ -56,11 +56,10 @@ First, choose where to install the data: we will refer to this directory as `$DA
 
 ## Model training & testing
 
-**Setup environment**
+**Setup environment (tested on `Ubuntu 14.04.6`)**
 
-    python3 -m venv venv
+    virtualenv --python=/usr/bin/python3.6 venv
     source venv/bin/activate
-    pip install --upgrade pip
     pip install -r requirements.txt
 
 **Train a model:**
