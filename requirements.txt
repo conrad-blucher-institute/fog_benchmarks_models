@@ -1,0 +1,12 @@
+numpy
+opencv-python
+pandas
+Pillow
+pytz
+scikit-learn
+scipy
+sklearn
+tifffile
+torch
+torchsat
+torchvision

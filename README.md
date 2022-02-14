@@ -56,6 +56,13 @@ First, choose where to install the data: we will refer to this directory as `$DA
 
 ## Model training & testing
 
+**Setup environment**
+
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install --upgrade pip
+    pip install -r requirements.txt
+
 **Train a model:**
 
     python fog_image_models.py -a $ARCHITECTURE -e $EPOCHS -i $UNIQ_ID -d $DATA_DIR -t $TARGET_DIR
