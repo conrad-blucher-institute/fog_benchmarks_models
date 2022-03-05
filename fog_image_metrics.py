@@ -46,14 +46,14 @@ def calcMetrics(y, ypred):
         metrics["HSS"] = (2*((a*d)-(b*c)))/(((a+c)*(c+d))+((a+b)*(b+d)))
         metrics["ORSS"] = ((a*d)-(b*c))/((a*d)+(b*c))
         metrics["CSS"] = ((a*d)-(b*c))/((a+b)*(c+d))
-    return metrics 
+    return metrics
 
 def printMetrics(metrics, label="", header = True):
     if header:
         print("LABEL,TN,FN,FP,TP,POD,F,FAR,CSI,PSS,HSS,ORSS,CSS")
     print("{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
         label,
-        metrics["tn"], metrics["fn"], metrics["fp"], metrics["tp"], 
+        metrics["tn"], metrics["fn"], metrics["fp"], metrics["tp"],
         metrics["POD"], metrics["F"], metrics["FAR"], metrics["CSI"],
         metrics["PSS"], metrics["HSS"], metrics["ORSS"], metrics["CSS"]))
 
@@ -61,7 +61,7 @@ def printMetrics(metrics, label="", header = True):
 def findOptimalThreshold(y, yprob, baseMetrics):
     length = yprob.shape[0]
     results = np.empty(shape = (900, 8), dtype='float')
-    ypred_ = np.zeros(length)
+    ypred_ = np.ones(length)
     bestMetrics = baseMetrics
     bestThr = None
 
